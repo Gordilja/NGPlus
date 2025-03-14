@@ -19,5 +19,6 @@ public class Slot : MonoBehaviour
         InventoryItem = Instantiate(prefab, transform);
         InventoryItem.originalSlot = this;
         InventoryItem.SetItem(item);
+        InventoryItem.Data.SlotIndex = SlotId;
     }
 }

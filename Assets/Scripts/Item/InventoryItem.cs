@@ -4,14 +4,14 @@ using UnityEngine.UI;
 
 public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
+    [HideInInspector] public InventoryItemData Data;
+    [HideInInspector] public Item Item;
+    public Slot originalSlot;
+    [SerializeField] private Image Icon;
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
-    private Camera mainCam;
-    public Image Icon;
-    public Item item;
-    public Canvas canvas;
-    public Slot originalSlot;
-    public PlayerInventory PlayerInventory;
+    private Canvas canvas;
+    private PlayerInventory PlayerInventory;
 
     void Start()
     {
@@ -19,8 +19,9 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
         canvas = FindObjectOfType<Canvas>(true);
         PlayerInventory = FindObjectOfType<PlayerInventory>();
         canvasGroup = GetComponent<CanvasGroup>();
-        mainCam = Camera.main;
         originalSlot = transform.parent.GetComponent<Slot>();
+        Data = new InventoryItemData();
+        Data.ItemIndex = Item.Id;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -59,11 +60,11 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
 
         if (newSlot != null)
         {
-            if (!newSlot.IsOccupied && (newSlot.AllowedItemType == item.Type || newSlot.AllowedItemType == ItemType.Default))
+            if (!newSlot.IsOccupied && (newSlot.AllowedItemType == Item.Type || newSlot.AllowedItemType == ItemType.Default))
             {
                 SetSlot(newSlot, false);
             }
-            else if (newSlot.IsOccupied && (newSlot.Item.Type == item.Type || newSlot.AllowedItemType == ItemType.Default))
+            else if (newSlot.IsOccupied && (newSlot.Item.Type == Item.Type || newSlot.AllowedItemType == ItemType.Default))
             {
                 SwapSlots(newSlot);
             }
@@ -76,20 +77,20 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
         {
             // Dropping outside the inventory
             Vector3 position = PlayerInventory.transform.position;
-            Instantiate(item.Model, position, Quaternion.identity);
+            Instantiate(Item.Model, position, Quaternion.identity);
             originalSlot.IsOccupied = false;
             originalSlot.Item = null;
-            PlayerInventory.ItemEquiped();
+            PlayerInventory.ItemEquiped(this);
             Destroy(gameObject);
         }
     }
 
     public void SetItem(Item _item)
     {
-        item = _item;
-        Icon.sprite = item.Icon;
+        Item = _item;
+        Icon.sprite = Item.Icon;
         originalSlot.IsOccupied = true;
-        originalSlot.Item = item;
+        originalSlot.Item = Item;
     }
 
     private void SetSlot(Slot newSlot, bool swap)
@@ -103,8 +104,9 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
         rectTransform.anchoredPosition = Vector3.zero;
         originalSlot = newSlot;
         originalSlot.IsOccupied = true;
-        originalSlot.Item = item;
-        PlayerInventory.ItemEquiped();
+        originalSlot.Item = Item;
+        Data.SlotIndex = originalSlot.SlotId;
+        PlayerInventory.ItemEquiped(this);
     }
 
     private void SwapSlots(Slot newSlot)
@@ -127,9 +129,9 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (eventData != null) 
+        if (eventData != null)
         {
-            Item item = eventData.pointerEnter.transform.parent.GetComponent<InventoryItem>().item;
+            Item item = eventData.pointerEnter.transform.parent.GetComponent<InventoryItem>().Item;
             PlayerInventory.Tooltip.Activate(item);
         }
     }
