@@ -2,12 +2,11 @@
 
 public class PlayerInventory : MonoBehaviour
 {
+    public Tooltip Tooltip;
     [SerializeField] private MainInventory MainInventory;
     [SerializeField] private CharacterEquipment CharacterGear;
-    [SerializeField] private Tooltip Tooltip;
     [SerializeField] private GameObject Helmet;
     [SerializeField] private GameObject Weapon;
-
     [SerializeField] private InputManager InputManagerDatabase;
 
     private void OnEnable()

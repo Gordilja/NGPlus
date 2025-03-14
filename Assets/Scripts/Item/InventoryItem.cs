@@ -6,6 +6,7 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
 {
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
+    private Camera mainCam;
     public Image Icon;
     public Item item;
     public Canvas canvas;
@@ -18,6 +19,7 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
         canvas = FindObjectOfType<Canvas>(true);
         PlayerInventory = FindObjectOfType<PlayerInventory>();
         canvasGroup = GetComponent<CanvasGroup>();
+        mainCam = Camera.main;
         originalSlot = transform.parent.GetComponent<Slot>();
     }
 
@@ -82,10 +84,6 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
         }
     }
 
-
-
-
-
     public void SetItem(Item _item)
     {
         item = _item;
@@ -129,11 +127,15 @@ public class InventoryItem : MonoBehaviour, IDragHandler, IEndDragHandler, IBegi
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        if (eventData != null) 
+        {
+            Item item = eventData.pointerEnter.transform.parent.GetComponent<InventoryItem>().item;
+            PlayerInventory.Tooltip.Activate(item);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        throw new System.NotImplementedException();
+        PlayerInventory.Tooltip.Deactivate();
     }
 }

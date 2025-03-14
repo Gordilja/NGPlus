@@ -1,20 +1,23 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Tooltip : MonoBehaviour
 {
-    //Tooltip Objects
-
+    [SerializeField] private TextMeshProUGUI ItemName;
+    [SerializeField] private TextMeshProUGUI Description;
+    private RectTransform recTransform;
     void Start()
     {
+        recTransform = GetComponent<RectTransform>();
         Deactivate();
     }
 
     public void Activate(Item _item) 
     {
         transform.gameObject.SetActive(true);
-        transform.GetChild(2).GetComponent<Text>().text = _item.Name;
-        transform.GetChild(3).GetComponent<Text>().text = _item.Description;       
+        ItemName.text = _item.Name;
+        Description.text = _item.Description;       
     }
 
     public void Deactivate() 
